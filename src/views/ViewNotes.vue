@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useNotesStore } from "../stores/notes";
 import { useWatchCharacters } from "../composables/useWatchCharacters";
@@ -20,6 +20,10 @@ const addNewNote = () => {
 };
 
 useWatchCharacters(newNote);
+
+onMounted(() => {
+  notesStore.getNotes();
+});
 </script>
 
 <template>
@@ -29,6 +33,21 @@ useWatchCharacters(newNote);
         <button @click="addNewNote" class="button is-link">Add New Note</button>
       </template>
     </AddEditNote>
-    <NoteItem v-for="note in notes" :key="note.id" :note="note" />
+
+    <progress
+      v-if="!notesStore.notesLoaded"
+      class="progress is-small is-primary"
+      max="100"
+    />
+    <template v-else>
+      <NoteItem v-for="note in notes" :key="note.id" :note="note" />
+      <div v-if="!notesStore.notes.length">
+        <p
+          class="has-text-centered has-text-grey-light is-family-monospace py-6"
+        >
+          No notes here yet ...
+        </p>
+      </div>
+    </template>
   </div>
 </template>
