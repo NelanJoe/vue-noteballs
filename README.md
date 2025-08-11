@@ -1,5 +1,13 @@
-# Vue 3 + TypeScript + Vite
+# Vue 3 + Firebase (Noteballs App)
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+I completed course [Vue JS 3: Composition API (with Pinia, Firebase 9 & Vite)](https://www.udemy.com/course/vue-js-3-composition-api/). with techstack Bulma, Typescript, VueJs, Pinia, Vue Router, and Firebase
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+### Feature App
+
+#### Auth
+
+![Preview Page Authentication!](/public/images/preview-auth.png "Preview Page Authentication")
+
+#### Notes
+
+![Preview Page Notes!](/public/images/preview-notes.png "Preview Page Notes")
