@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onClickOutside } from "@vueuse/core";
 import { onMounted, useTemplateRef } from "vue";
+import { onClickOutside } from "@vueuse/core";
 import { useNotesStore } from "../stores/notes";
 
 defineProps<{ modelValue: boolean; noteId: string }>();
@@ -32,25 +32,29 @@ onMounted(() => {
 <template>
   <div class="modal is-active">
     <div class="modal-background"></div>
-    <div class="modal-card" ref="modalCardRef">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Delete Note?</p>
-        <button class="delete" aria-label="close" @click="closeModal"></button>
-      </header>
-      <section class="modal-card-body">
-        Are you sure you want to delete this note?
-      </section>
-      <footer class="modal-card-foot is-justify-content-flex-end">
-        <div class="buttons">
-          <button class="button" @click="closeModal">Cancel</button>
-          <button
-            class="button is-danger"
-            @click="notesStore.deleteNote(noteId)"
-          >
-            Delete
-          </button>
+    <section class="modal-content" ref="modalCardRef">
+      <div class="card">
+        <div class="card-content">
+          <div class="is-flex is-justify-content-space-between">
+            <p class="modal-card-title">Delete Note?</p>
+            <button
+              class="delete"
+              aria-label="close"
+              @click="closeModal"
+            ></button>
+          </div>
+          <p class="py-5">Are you sure you want to delete this note?</p>
+          <div class="buttons is-flex is-justify-content-flex-end">
+            <button class="button is-small" @click="closeModal">Cancel</button>
+            <button
+              class="button is-small is-danger"
+              @click="notesStore.deleteNote(noteId)"
+            >
+              Delete
+            </button>
+          </div>
         </div>
-      </footer>
-    </div>
+      </div>
+    </section>
   </div>
 </template>

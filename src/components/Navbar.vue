@@ -2,6 +2,7 @@
 import { shallowRef, useTemplateRef } from "vue";
 import { RouterLink } from "vue-router";
 import { onClickOutside } from "@vueuse/core";
+import { useAuthStore } from "../stores/auth";
 
 const showNavbarMenu = shallowRef(false);
 const navbarMenuRef = useTemplateRef("navbarMenuRef");
@@ -9,18 +10,24 @@ const navbarMenuRef = useTemplateRef("navbarMenuRef");
 onClickOutside(navbarMenuRef, () => {
   showNavbarMenu.value = false;
 });
+
+const authStore = useAuthStore();
 </script>
 
 <template>
-  <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+  <nav
+    class="navbar is-link is-fixed-top"
+    role="navigation"
+    aria-label="main navigation"
+  >
     <div class="container is-max-desktop px-2">
       <div class="navbar-brand">
-        <div class="navbar-item is-size-4 has-text-primary-100">Noteballs</div>
+        <div class="navbar-item is-size-5">Noteballs</div>
         <a
           @click="showNavbarMenu = !showNavbarMenu"
+          class="navbar-burger has-text-white"
           :class="{ 'is-active': showNavbarMenu }"
           role="button"
-          class="navbar-burger has-text-primary-100"
           aria-label="menu"
           aria-expanded="false"
           data-target="navbarBasicExample"
@@ -38,27 +45,24 @@ onClickOutside(navbarMenuRef, () => {
         class="navbar-menu"
         :class="{ 'is-active': showNavbarMenu }"
       >
+        <div class="navbar-start">
+          <RouterLink to="/" class="navbar-item is-size-6"> Notes </RouterLink>
+          <RouterLink to="/stats" class="navbar-item is-size-6">
+            Stats
+          </RouterLink>
+        </div>
         <div class="navbar-end">
           <div class="navbar-item">
-            <RouterLink to="/" class="navbar-item has-text-primary-100">
-              Home
-            </RouterLink>
-            <RouterLink to="/stats" class="navbar-item has-text-primary-100">
-              Stats
-            </RouterLink>
+            <button
+              v-if="authStore.user?.id"
+              class="button is-small is-danger has-text-white"
+              @click="authStore.logoutUser"
+            >
+              Logout {{ authStore.user.email }}
+            </button>
           </div>
         </div>
       </div>
     </div>
   </nav>
 </template>
-
-<style scoped>
-@media only screen and (max-width: 1023px) {
-  .navbar-menu {
-    position: absolute;
-    left: 0;
-    width: 100%;
-  }
-}
-</style>

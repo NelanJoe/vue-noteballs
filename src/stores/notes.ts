@@ -1,81 +1,116 @@
+import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import type { Note } from "../types";
 import {
   addDoc,
   collection,
+  type CollectionReference,
   deleteDoc,
   doc,
   onSnapshot,
   orderBy,
+  type Query,
   query,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import type { Note } from "../types";
+import { useAuthStore } from "./auth";
 
-const notesCollectionRef = collection(db, "notes");
-const notesCollectionQuery = query(notesCollectionRef, orderBy("date", "desc"));
+export const useNotesStore = defineStore("notes", () => {
+  let notesCollectionRef: CollectionReference;
+  let notesCollectionQuery: Query;
 
-export const useNotesStore = defineStore("storeNotes", {
-  state: () => {
-    return {
-      notes: [] as Note[],
-      notesLoaded: false,
-    };
-  },
-  actions: {
-    async getNotes() {
-      this.notesLoaded = false;
+  const notes = ref<Note[]>([]);
+  const notesLoaded = ref(false);
 
-      onSnapshot(notesCollectionQuery, (querySnapshot) => {
-        const notes: Note[] = [];
+  const authStore = useAuthStore();
 
-        querySnapshot.docs.map((doc) => {
-          notes.push({
-            id: doc.id,
-            content: doc.data().content,
-            date: doc.data().date,
-          });
+  let getNotesSnapshot: (() => void) | null = null;
+
+  const totalNotesCount = computed(() => notes.value.length);
+
+  const totalCharactersCount = computed(() =>
+    notes.value.reduce((acc, note) => acc + note.content.length, 0)
+  );
+
+  const getNoteContent = computed(
+    () => (noteId: string) =>
+      notes.value.find((note) => note.id === noteId)?.content
+  );
+
+  const init = () => {
+    if (authStore.user !== null) {
+      notesCollectionRef = collection(db, "users", authStore.user.id, "notes");
+      notesCollectionQuery = query(notesCollectionRef, orderBy("date", "desc"));
+      getNotes();
+    }
+  };
+
+  const getNotes = async () => {
+    notesLoaded.value = false;
+
+    getNotesSnapshot = onSnapshot(notesCollectionQuery, (querySnapshot) => {
+      let notesData = [] as Note[];
+
+      querySnapshot.docs.map((doc) => {
+        notesData.push({
+          id: doc.id,
+          content: doc.data().content,
+          date: doc.data().date,
         });
-
-        this.notes = notes;
-        this.notesLoaded = true;
       });
-    },
-    async addNote(content: string) {
-      const currentDate = new Date().getTime().toString();
 
-      await addDoc(notesCollectionRef, {
-        content,
-        date: currentDate,
-      });
-    },
-    async deleteNote(noteId: string) {
-      await deleteDoc(doc(notesCollectionRef, noteId));
-    },
-    async updateNote({ noteId, content }: { noteId: string; content: string }) {
-      if (!noteId) return;
+      notes.value = notesData;
+      notesLoaded.value = true;
+    });
+  };
 
-      const noteRef = doc(notesCollectionRef, noteId);
-      const currentDate = new Date().getTime().toString();
+  const clearNotes = () => {
+    notes.value = [];
+    if (getNotesSnapshot) {
+      getNotesSnapshot(); // unsubscribes from any active listeners
+    }
+  };
 
-      if (!noteRef) return;
+  const addNote = async (content: string) => {
+    const currentDate = new Date().getTime().toString();
 
-      await updateDoc(noteRef, {
-        content,
-        date: currentDate,
-      });
-    },
-  },
-  getters: {
-    getNoteContent: (state) => {
-      return (noteId: string) =>
-        state.notes.find((note) => note.id === noteId)?.content;
-    },
-    totalNotesCount: (state) => {
-      return state.notes.length;
-    },
-    totalCharactersCount: (state) => {
-      return state.notes.reduce((acc, note) => acc + note.content.length, 0);
-    },
-  },
+    await addDoc(notesCollectionRef, {
+      content,
+      date: currentDate,
+    });
+  };
+
+  const deleteNote = async (noteId: string) => {
+    await deleteDoc(doc(notesCollectionRef, noteId));
+  };
+
+  const updateNote = async ({
+    noteId,
+    content,
+  }: {
+    noteId: string;
+    content: string;
+  }) => {
+    const date = new Date().getTime().toString();
+
+    await updateDoc(doc(notesCollectionRef, noteId), {
+      content,
+      date,
+    });
+  };
+
+  return {
+    notes,
+    notesLoaded,
+    getNoteContent,
+    totalNotesCount,
+    totalCharactersCount,
+    init,
+    getNotes,
+    clearNotes,
+    addNote,
+    deleteNote,
+    updateNote,
+  };
 });

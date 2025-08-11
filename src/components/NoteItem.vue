@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from "vue";
-import type { Note } from "../types";
-import ModalDeleteNote from "./ModalDeleteNote.vue";
 import { useDateFormat } from "@vueuse/core";
+import ModalDeleteNote from "./ModalDeleteNote.vue";
+import type { Note } from "../types";
 
 const props = defineProps<{ note: Note }>();
 

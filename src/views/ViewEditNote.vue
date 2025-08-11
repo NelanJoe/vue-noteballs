@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import AddEditNote from "../components/AddEditNote.vue";
 import { useNotesStore } from "../stores/notes";
+import AddEditNote from "../components/AddEditNote.vue";
+import DefaultLayout from "../layouts/DefaultLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,16 +27,18 @@ const handleSaveNote = () => {
 </script>
 
 <template>
-  <div class="edit-note">
-    <AddEditNote v-model="noteContent" :placeholder="'Edit a note'">
-      <template #buttons>
-        <button class="button is-link is-light" @click="router.back()">
-          Cancel
-        </button>
-        <button @click="handleSaveNote" class="button is-link">
-          Save Note
-        </button>
-      </template>
-    </AddEditNote>
-  </div>
+  <DefaultLayout>
+    <div class="edit-note">
+      <AddEditNote v-model="noteContent" :placeholder="'Edit a note'">
+        <template #buttons>
+          <button class="button is-link is-light" @click="router.back()">
+            Cancel
+          </button>
+          <button @click="handleSaveNote" class="button is-link">
+            Save Note
+          </button>
+        </template>
+      </AddEditNote>
+    </div>
+  </DefaultLayout>
 </template>

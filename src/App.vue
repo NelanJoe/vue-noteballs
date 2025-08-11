@@ -1,13 +1,19 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { RouterView } from "vue-router";
-import Navbar from "./components/Navbar.vue";
+import { useAuthStore } from "./stores/auth";
+
+const authStore = useAuthStore();
+
+onMounted(() => {
+  authStore.init();
+});
 </script>
 
 <template>
-  <Navbar />
-  <main class="container is-max-desktop px-2 py-4">
+  <div>
     <RouterView />
-  </main>
+  </div>
 </template>
 
 <style>
